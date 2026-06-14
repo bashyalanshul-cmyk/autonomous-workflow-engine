@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataPulse AI - Autonomous Data Pipeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="gradient-bg text-white py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">⚡ DataPulse AI</h1>
+            <p class="text-lg md:text-xl opacity-90">AI-powered data processing, ESG analysis, cybersecurity scanning, and visualizations in one automated pipeline</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        <!-- Upload Section -->
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📤 Upload Your Data</h2>
+                <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-500 transition-colors">
+                        <input type="file" name="file" id="file-input" multiple accept=".csv,.xlsx,.xls,.json" class="hidden">
+                        <label for="file-input" class="cursor-pointer">
+                            <div class="text-6xl mb-4">📁</div>
+                            <p class="text-lg text-gray-600 mb-2">Click to browse or drag & drop</p>
+                            <p class="text-sm text-gray-400">Supports CSV, Excel, and JSON files</p>
+                        </label>
+                    </div>
+                    <button type="submit" class="w-full gradient-bg text-white font-semibold py-4 px-8 rounded-xl text-lg hover:opacity-90 transition-opacity">
+                        🚀 Process Files
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Previous Runs -->
+        <section>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">📜 Previous Runs</h2>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {% if runs %}
+                    {% for run in runs %}
+                        <a href="{{ url_for('view_run', run_id=run.id) }}" class="bg-white rounded-xl shadow-md p-6 card-hover block">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm text-purple-600 font-medium bg-purple-50 px-3 py-1 rounded-full">
+                                    {{ run.risk_level }} Risk
+                                </span>
+                                <span class="text-gray-400 text-sm">
+                                    {% if run.date %}
+                                        {{ run.date[:16] }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <h3 class="font-semibold text-gray-800 mb-3 text-lg">{{ run.id }}</h3>
+                            <div class="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                                <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                    <div class="text-2xl font-bold text-purple-600">{{ run.datasets }}</div>
+                                    <div>Datasets</div>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                    <div class="text-2xl font-bold text-purple-600">{{ run.charts }}</div>
+                                    <div>Charts</div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-span-full bg-gray-50 rounded-xl p-12 text-center">
+                        <div class="text-6xl mb-4">📭</div>
+                        <h3 class="text-xl text-gray-700 font-medium mb-2">No runs yet</h3>
+                        <p class="text-gray-500">Upload a file above to get started!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="mt-16">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">✨ Features</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Data Processing</h3>
+                    <p class="text-gray-600 text-sm">Ingest, clean, and analyze your data automatically</p>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
+                    <div class="text-4xl mb-4">🌱</div>
+                    <h3 class="font-semibold text-gray-800 mb-2">ESG Analysis</h3>
+                    <p class="text-gray-600 text-sm">Environmental, Social, and Governance insights</p>
+                </div>
+                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Cybersecurity</h3>
+                    <p class="text-gray-600 text-sm">Detect sensitive data and security risks</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
+                    <div class="text-4xl mb-4">🤖</div>
+                    <h3 class="font-semibold text-gray-800 mb-2">AI Insights</h3>
+                    <p class="text-gray-600 text-sm">Intelligent analysis powered by OpenAI</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-gray-400">Built with ❤️ using Python, Flask, and OpenAI</p>
+        </div>
+    </footer>
+</body>
+</html>

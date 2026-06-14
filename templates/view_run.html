@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataPulse AI - Run: {{ data.run_id }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%); }
+        .risk-low { background: #10B981; }
+        .risk-medium { background: #F59E0B; }
+        .risk-high { background: #EF4444; }
+        .risk-critical { background: #991B1B; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="gradient-bg text-white py-8">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex items-center gap-4 mb-4">
+                <a href="{{ url_for('index') }}" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors">← Back</a>
+                <h1 class="text-3xl font-bold">⚡ DataPulse AI - Run: {{ data.run_id }}</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-10">
+        <!-- Executive Summary -->
+        {% if data.summary %}
+            {% set summary = data.summary.executive_summary %}
+            <section class="mb-10 bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📋 Executive Summary</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl text-center">
+                        <div class="text-4xl font-bold text-purple-700">{{ summary.total_datasets }}</div>
+                        <div class="text-purple-800 font-medium">Datasets</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl text-center">
+                        <div class="text-4xl font-bold text-blue-700">{{ "%.1f"|format(summary.average_data_quality) }}%</div>
+                        <div class="text-blue-800 font-medium">Data Quality</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl text-center">
+                        <div class="text-4xl font-bold text-green-700">{{ "%.1f"|format(summary.average_esg_score) }}%</div>
+                        <div class="text-green-800 font-medium">ESG Score</div>
+                    </div>
+                    <div class="p-6 rounded-xl text-center {% if summary.overall_risk_level == 'Low' %}bg-gradient-to-br from-green-50 to-green-100{% elif summary.overall_risk_level == 'Medium' %}bg-gradient-to-br from-yellow-50 to-yellow-100{% else %}bg-gradient-to-br from-red-50 to-red-100{% endif %}">
+                        <div class="text-3xl font-bold {% if summary.overall_risk_level == 'Low' %}text-green-700{% elif summary.overall_risk_level == 'Medium' %}text-yellow-700{% else %}text-red-700{% endif %}">{{ summary.overall_risk_level }}</div>
+                        <div class="{% if summary.overall_risk_level == 'Low' %}text-green-800{% elif summary.overall_risk_level == 'Medium' %}text-yellow-800{% else %}text-red-800{% endif %} font-medium">Security Risk</div>
+                    </div>
+                </div>
+
+                {% if summary.key_highlights %}
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Key Highlights</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {% for highlight in summary.key_highlights %}
+                                <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm">✅ {{ highlight }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
+
+        <!-- AI Insights -->
+        {% if data.insights %}
+            {% set all_insights = data.insights.all_insights %}
+            {% if all_insights %}
+                <section class="mb-10 bg-white rounded-2xl shadow-xl p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        🤖 AI Insights
+                        {% if all_insights[0].demo_mode %}
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs">Demo Mode</span>
+                        {% endif %}
+                    </h2>
+                    
+                    {% for insight in all_insights %}
+                        <div class="border-b border-gray-100 last:border-0 pb-6 mb-6 last:mb-0 last:pb-0">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ insight.dataset_name }}</h3>
+                            
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-medium text-gray-700 mb-3">🔍 Key Findings</h4>
+                                    <ul class="space-y-2">
+                                        {% for finding in insight.key_findings %}
+                                            <li class="flex items-start gap-2 text-gray-600">
+                                                <span class="text-purple-600 mt-1">•</span> {{ finding }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-700 mb-3">💡 Recommendations</h4>
+                                    <ul class="space-y-2">
+                                        {% for rec in insight.recommendations %}
+                                            <li class="flex items-start gap-2 text-gray-600">
+                                                <span class="text-green-600 mt-1">→</span> {{ rec }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            {% if insight.business_impact %}
+                                <div class="mt-4 p-4 bg-blue-50 rounded-xl">
+                                    <h4 class="font-medium text-blue-800 mb-1">📈 Business Impact</h4>
+                                    <p class="text-blue-700">{{ insight.business_impact }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endif %}
+
+        <!-- ESG Analysis -->
+        {% if data.esg %}
+            {% set all_esg = data.esg.all_esg %}
+            {% if all_esg %}
+                <section class="mb-10 bg-white rounded-2xl shadow-xl p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">🌱 ESG Analysis</h2>
+                    
+                    {% for esg in all_esg %}
+                        <div class="border-b border-gray-100 last:border-0 pb-6 mb-6 last:mb-0 last:pb-0">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ esg.dataset_name }}</h3>
+                            <div class="grid md:grid-cols-3 gap-6 mb-4">
+                                <div class="bg-blue-50 p-4 rounded-xl text-center">
+                                    <div class="text-3xl font-bold text-blue-600">{{ "%.0f"|format(esg.environmental_score) }}%</div>
+                                    <div class="text-blue-700 font-medium">Environmental</div>
+                                </div>
+                                <div class="bg-green-50 p-4 rounded-xl text-center">
+                                    <div class="text-3xl font-bold text-green-600">{{ "%.0f"|format(esg.social_score) }}%</div>
+                                    <div class="text-green-700 font-medium">Social</div>
+                                </div>
+                                <div class="bg-purple-50 p-4 rounded-xl text-center">
+                                    <div class="text-3xl font-bold text-purple-600">{{ "%.0f"|format(esg.governance_score) }}%</div>
+                                    <div class="text-purple-700 font-medium">Governance</div>
+                                </div>
+                            </div>
+                            
+                            {% if esg.recommendations %}
+                                <div class="space-y-2">
+                                    {% for rec in esg.recommendations %}
+                                        <div class="text-gray-600">💡 {{ rec }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endif %}
+
+        <!-- Security Report -->
+        {% if data.security %}
+            {% set all_security = data.security.all_security %}
+            {% if all_security %}
+                <section class="mb-10 bg-white rounded-2xl shadow-xl p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">🔒 Cybersecurity Risk Report</h2>
+                    
+                    {% for sec in all_security %}
+                        <div class="border-b border-gray-100 last:border-0 pb-6 mb-6 last:mb-0 last:pb-0">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">{{ sec.dataset_name }}</h3>
+                                <span class="px-4 py-1 rounded-full text-white font-medium {% if sec.risk_level == 'Low' %}risk-low{% elif sec.risk_level == 'Medium' %}risk-medium{% elif sec.risk_level == 'High' %}risk-high{% else %}risk-critical{% endif %}">
+                                    {{ sec.risk_level }} Risk
+                                </span>
+                            </div>
+                            
+                            {% if sec.findings %}
+                                <div class="mb-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">⚠️ Findings</h4>
+                                    <div class="space-y-2">
+                                        {% for finding in sec.findings %}
+                                            <div class="flex items-center gap-3 p-3 {% if finding.severity == 'High' %}bg-red-50 border border-red-100{% else %}bg-yellow-50 border border-yellow-100{% endif %} rounded-lg">
+                                                <span class="{% if finding.severity == 'High' %}text-red-600{% else %}text-yellow-600{% endif %} font-medium">
+                                                    {{ finding.severity }}
+                                                </span>
+                                                <span class="text-gray-700">{{ finding.data_type }}: {{ finding.matches_found }} matches</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            {% if sec.recommendations %}
+                                <div class="space-y-2">
+                                    {% for rec in sec.recommendations %}
+                                        <div class="text-gray-600">🛡️ {{ rec }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endif %}
+
+        <!-- Charts -->
+        {% if data.charts %}
+            <section class="mb-10 bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📈 Visualizations</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    {% for chart in data.charts %}
+                        <div class="bg-gray-50 rounded-xl overflow-hidden">
+                            <img src="{{ url_for('serve_chart', run_id=data.run_id, filename=chart) }}" alt="{{ chart }}" class="w-full">
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        <!-- Downloads -->
+        <section class="bg-white rounded-2xl shadow-xl p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">📥 Download Files</h2>
+            <div class="flex flex-wrap gap-4">
+                {% for file in data.cleaned_files %}
+                    <a href="{{ url_for('download_file', run_id=data.run_id, filename=file) }}" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-xl transition-colors font-medium">
+                        📄 {{ file }}
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-gray-400">Built with ❤️ using Python, Flask, and OpenAI</p>
+        </div>
+    </footer>
+</body>
+</html>
