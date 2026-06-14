@@ -26,21 +26,59 @@
         <section class="mb-12">
             <div class="bg-white rounded-2xl shadow-xl p-8 card-hover">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">📤 Upload Your Data</h2>
-                <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-500 transition-colors">
+                <form id="upload-form" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-green-500 transition-colors">
                         <input type="file" name="file" id="file-input" multiple accept=".csv,.xlsx,.xls,.json" class="hidden">
-                        <label for="file-input" class="cursor-pointer">
+                        <label for="file-input" class="cursor-pointer" id="file-label">
                             <div class="text-6xl mb-4">📁</div>
                             <p class="text-lg text-gray-600 mb-2">Click to browse or drag & drop</p>
-                            <p class="text-sm text-gray-400">Supports CSV, Excel, and JSON files</p>
+                            <p class="text-sm text-gray-400">Supports CSV, Excel, and JSON files (up to 500MB)</p>
                         </label>
+                        <div id="file-list" class="mt-4 text-left max-h-40 overflow-y-auto"></div>
                     </div>
-                    <button type="submit" class="w-full gradient-bg text-white font-semibold py-4 px-8 rounded-xl text-lg hover:opacity-90 transition-opacity">
+                    <button type="submit" id="submit-btn" class="w-full gradient-bg text-white font-semibold py-4 px-8 rounded-xl text-lg hover:opacity-90 transition-opacity">
                         🚀 Process Files
                     </button>
                 </form>
             </div>
         </section>
+
+        <script>
+            const fileInput = document.getElementById('file-input');
+            const fileLabel = document.getElementById('file-label');
+            const fileList = document.getElementById('file-list');
+            const uploadForm = document.getElementById('upload-form');
+            const submitBtn = document.getElementById('submit-btn');
+
+            fileInput.addEventListener('change', function() {
+                fileList.innerHTML = '';
+                if (this.files.length > 0) {
+                    Array.from(this.files).forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'flex items-center gap-2 p-2 bg-gray-50 rounded mb-1';
+                        fileItem.innerHTML = `
+                            <span class="text-green-600">✅</span>
+                            <span class="text-sm text-gray-700 truncate flex-1">${file.name}</span>
+                            <span class="text-xs text-gray-400">${(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                        `;
+                        fileList.appendChild(fileItem);
+                    });
+                }
+            });
+
+            uploadForm.addEventListener('submit', function(e) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <div class="flex items-center justify-center gap-2">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing files...
+                    </div>
+                `;
+            });
+        </script>
 
         <!-- Previous Runs -->
         <section>

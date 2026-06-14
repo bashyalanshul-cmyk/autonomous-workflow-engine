@@ -26,11 +26,18 @@ class CybersecurityRiskScanner:
             "recommendations": []
         }
         
-        text_content = str(df.columns.tolist()) + " " + str(df.head(50).values.flatten().tolist())
-        text_content = text_content.lower()
+        # Get only string values to avoid matching numbers
+        text_parts = [str(df.columns.tolist())]
+        for col in df.columns:
+            if pd.api.types.is_object_dtype(df[col]) or pd.api.types.is_string_dtype(df[col]):
+                text_parts.extend(df[col].head(50).astype(str).tolist())
+        
+        text_content = " ".join(text_parts).lower()
         
         for data_type, pattern in self.sensitive_patterns.items():
             matches = re.findall(pattern, text_content, re.IGNORECASE)
+            # Filter out empty matches
+            matches = [m for m in matches if m]
             if matches:
                 risk_report["findings"].append({
                     "data_type": data_type,
