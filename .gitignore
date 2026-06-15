@@ -38,3 +38,8 @@ wheels/
 # OS files
 .DS_Store
 Thumbs.db
+.env
+__pycache__/
+*.pyc
+.DS_Store
+data/
