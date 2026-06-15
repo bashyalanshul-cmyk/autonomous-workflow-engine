@@ -31,7 +31,7 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
-Then open your browser and go to: **http://localhost:5001**
+Then open your browser and go to: **[http://localhost:5001](https://datapulse-ai-7006.onrender.com/)**
 
 ### 3. Or use the command line
 ```bash
