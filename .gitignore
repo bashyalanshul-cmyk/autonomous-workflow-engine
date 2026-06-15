@@ -43,3 +43,10 @@ __pycache__/
 *.pyc
 .DS_Store
 data/
+input_data/*.xlsx
+input_data/*.xls
+input_data/*.csv
+*.pkl
+output_demo/
+logs/
+output_data/
