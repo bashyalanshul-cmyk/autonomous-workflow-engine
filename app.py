@@ -152,8 +152,14 @@ def download_file(run_id, filename):
 
 
 if __name__ == '__main__':
-    print("\n⚡ Starting DataPulse AI Dashboard!")
+    import os
+    port = int(os.environ.get('PORT', 5001))
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    print(f"\n⚡ Starting DataPulse AI Dashboard on port {port}!")
     print("=" * 60)
-    print("Open your browser and go to: http://localhost:5001")
-    print("=" * 60)
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    if debug:
+        print("Open your browser and go to: http://localhost:5001")
+        app.run(debug=True, host='0.0.0.0', port=port)
+    else:
+        print(f"Server running on port {port}")
+        app.run(debug=False, host='0.0.0.0', port=port)
